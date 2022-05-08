@@ -1,10 +1,8 @@
 package com.example.movieapp.main.ui;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.LayoutInflater;
 
 import com.example.movieapp.R;
@@ -47,4 +45,12 @@ public class MainActivity extends AppCompatActivity {
         component.inject(this);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+            super.onBackPressed();
+        } else {
+            finish();
+        }
+    }
 }
