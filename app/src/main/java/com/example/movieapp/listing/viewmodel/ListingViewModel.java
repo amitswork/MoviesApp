@@ -11,13 +11,16 @@ import androidx.lifecycle.LiveData;
 
 import com.example.movieapp.base.model.EventData;
 import com.example.movieapp.base.viewmodel.BaseViewModel;
+import com.example.movieapp.listing.constants.BookMarkItemType;
 import com.example.movieapp.listing.helper.ListingResponseConverter;
 import com.example.movieapp.listing.helper.SectionName;
-import com.example.movieapp.listing.model.response.MovieResultData;
 import com.example.movieapp.listing.model.response.MoviesResponse;
+import com.example.movieapp.listing.repository.BookmarkRepository;
 import com.example.movieapp.listing.repository.ListingRepository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -28,20 +31,27 @@ import io.reactivex.schedulers.Schedulers;
 public class ListingViewModel extends BaseViewModel {
 
     ListingRepository repository;
+    BookmarkRepository bookmarkRepository;
     ListingResponseConverter converter;
 
     public ObservableBoolean showTrendingSection = new ObservableBoolean(false);
     public ObservableBoolean showNowPlayingSection = new ObservableBoolean(false);
 
-    private MoviesResponse trendingSectionResponse;
-    private int lastTrendingSectionPageRequested = 0;
+    MoviesResponse trendingSectionResponse;
+    int lastTrendingSectionPageRequested = 0;
 
-    private MoviesResponse nowPlayingSectionResponse;
-    private int lastNowPlayingSectionPageRequested = 0;
+    MoviesResponse nowPlayingSectionResponse;
+    int lastNowPlayingSectionPageRequested = 0;
 
-    public ListingViewModel(ListingRepository repository, ListingResponseConverter converter) {
+    HashMap<SectionName, ArrayList<MovieCardViewModel>> uiItemsMap = new HashMap<>();
+
+    HashSet<String> bookmarkedMovieIds = new HashSet<>();
+
+
+    public ListingViewModel(ListingRepository repository, ListingResponseConverter converter, BookmarkRepository bookmarkRepository) {
         this.repository = repository;
         this.converter = converter;
+        this.bookmarkRepository = bookmarkRepository;
     }
 
     public void fetchTrendingMovies() {
@@ -52,23 +62,22 @@ public class ListingViewModel extends BaseViewModel {
         Disposable disposable = repository.fetchTrendingMovies(Integer.toString(lastTrendingSectionPageRequested))
                 .map(response -> {
                     trendingSectionResponse = mergeResponse(trendingSectionResponse, response);
-                    println("page - "+lastTrendingSectionPageRequested + " - " + trendingSectionResponse.getResults().size());
                     repository.syncDbWithServerResponseForSection(SectionName.TRENDING_SECTION, trendingSectionResponse);
-                    return converter.convertToUiData(response);
+                    return response;
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(movieResultData -> { }, e -> {
                     lastTrendingSectionPageRequested --;
-                    updateEventStream(new EventData(API_ERROR));
+                    setEventStream(new EventData(API_ERROR));
                 });
 
         addDisposable(disposable);
     }
 
     private boolean checkIfTrendingSectionAlreadyRequested() {
-        return lastTrendingSectionPageRequested > 0 &&
-                lastTrendingSectionPageRequested > trendingSectionResponse.getPage();
+        return (lastTrendingSectionPageRequested > 0 && trendingSectionResponse == null)
+                || (trendingSectionResponse != null && lastTrendingSectionPageRequested > trendingSectionResponse.getPage());
     }
 
     public MoviesResponse getTrendingSectionResponse() {
@@ -84,21 +93,21 @@ public class ListingViewModel extends BaseViewModel {
                 .map(response -> {
                     nowPlayingSectionResponse = mergeResponse(nowPlayingSectionResponse, response);
                     repository.syncDbWithServerResponseForSection(SectionName.NOW_PLAYING_SECTION, nowPlayingSectionResponse);
-                    return converter.convertToUiData(response);
+                    return response;
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(movieResultData -> { }, e -> {
                     lastNowPlayingSectionPageRequested --;
-                    updateEventStream(new EventData(API_ERROR));
+                    setEventStream(new EventData(API_ERROR));
                 });
 
         addDisposable(disposable);
     }
 
     private boolean checkIfNowPlayingSectionAlreadyRequested() {
-        return lastNowPlayingSectionPageRequested > 0 &&
-                lastNowPlayingSectionPageRequested > nowPlayingSectionResponse.getPage();
+        return (lastNowPlayingSectionPageRequested > 0 && nowPlayingSectionResponse == null)
+                || (nowPlayingSectionResponse != null && lastNowPlayingSectionPageRequested > nowPlayingSectionResponse.getPage());
     }
 
     public MoviesResponse getNowPlayingSectionResponse() {
@@ -117,25 +126,23 @@ public class ListingViewModel extends BaseViewModel {
         return repository.getSectionMoviesFromDb(sectionName);
     }
 
-    public ArrayList<MovieResultData> convertToMoviesResultData(MoviesResponse moviesResponses) {
+    public LiveData<List<String>> getBookmarkedMovieIds() {
+        return bookmarkRepository.getAllBookmarkedItemIds(BookMarkItemType.MOVIE);
+    }
+
+    public ArrayList<MovieCardViewModel> convertToMoviesResultData(MoviesResponse moviesResponses) {
         return converter.convertToUiData(moviesResponses);
     }
 
-    public void updateSectionResponse(SectionName sectionName, MoviesResponse moviesResponses) {
-        switch (sectionName) {
-            case TRENDING_SECTION:
-                trendingSectionResponse = moviesResponses;
-                lastTrendingSectionPageRequested = moviesResponses.getPage();
-                break;
-            case NOW_PLAYING_SECTION:
-                nowPlayingSectionResponse = moviesResponses;
-                lastNowPlayingSectionPageRequested = moviesResponses.getPage();
-                break;
-            default:
+    public void handleSectionsUpdate(SectionName sectionName, MoviesResponse moviesResponses) {
+        if (moviesResponses == null) {
+            fetchDataFromServerFor(sectionName);
+        } else {
+            updateSectionResponse(sectionName, moviesResponses);
         }
     }
 
-    public void fetchDataFromServerFor(SectionName sectionName) {
+    void fetchDataFromServerFor(SectionName sectionName) {
         switch (sectionName) {
             case TRENDING_SECTION:
                 fetchTrendingMovies();
@@ -146,4 +153,44 @@ public class ListingViewModel extends BaseViewModel {
             default:
         }
     }
+
+    void updateSectionResponse(SectionName sectionName, MoviesResponse moviesResponses) {
+        ArrayList<MovieCardViewModel> convertedResponse = convertToMoviesResultData(moviesResponses);
+        uiItemsMap.put(sectionName, convertedResponse);
+        updateBookmarkedCards();
+        switch (sectionName) {
+            case TRENDING_SECTION:
+                trendingSectionResponse = moviesResponses;
+                lastTrendingSectionPageRequested = moviesResponses.getPage();
+                setEventStream(new EventData(UPDATE_TRENDING_DATA, convertedResponse));
+                break;
+            case NOW_PLAYING_SECTION:
+                nowPlayingSectionResponse = moviesResponses;
+                lastNowPlayingSectionPageRequested = moviesResponses.getPage();
+                setEventStream(new EventData(UPDATE_NOW_PLAYING_DATA, convertedResponse));
+                break;
+            default:
+        }
+    }
+
+    public void handleBookmarkedMovies(List<String> bookmarkedMovieIds) {
+        updateBookmarkedMovieIds(bookmarkedMovieIds);
+        updateBookmarkedCards();
+    }
+
+    void updateBookmarkedMovieIds(List<String> bookmarkedMovieIds) {
+        this.bookmarkedMovieIds.clear();
+        this.bookmarkedMovieIds.addAll(bookmarkedMovieIds);
+    }
+
+    private void updateBookmarkedCards() {
+        for (ArrayList<MovieCardViewModel> sectionCards : uiItemsMap.values()) {
+            for (MovieCardViewModel card : sectionCards) {
+                boolean isBookmarked = bookmarkedMovieIds.contains(card.data.getId());
+                card.updateBookmark(isBookmarked);
+            }
+        }
+    }
+
+
 }

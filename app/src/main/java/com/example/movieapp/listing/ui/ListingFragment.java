@@ -19,9 +19,8 @@ import com.example.movieapp.databinding.FragmentListingLayoutBinding;
 import com.example.movieapp.listing.adapter.MovieAdapter;
 import com.example.movieapp.listing.helper.PaginationScroller;
 import com.example.movieapp.listing.helper.SectionName;
-import com.example.movieapp.listing.model.response.MovieResultData;
-import com.example.movieapp.listing.model.response.MoviesResponse;
 import com.example.movieapp.listing.viewmodel.ListingViewModel;
+import com.example.movieapp.listing.viewmodel.MovieCardViewModel;
 import com.example.movieapp.main.ui.MainActivity;
 
 import java.lang.reflect.Array;
@@ -48,29 +47,12 @@ public class ListingFragment extends BaseFragment<ListingViewModel, FragmentList
     private void addSectionObservers() {
         for (SectionName value : SectionName.values()) {
             viewModel.getSectionsData(value).observe(getViewLifecycleOwner(), moviesResponses -> {
-                if (moviesResponses == null) {
-                    viewModel.fetchDataFromServerFor(value);
-                } else {
-                    viewModel.updateSectionResponse(value, moviesResponses);
-                    ArrayList<MovieResultData> convertedResponse = viewModel.convertToMoviesResultData(moviesResponses);
-                    updateSection(value, convertedResponse);
-                }
+                viewModel.handleSectionsUpdate(value, moviesResponses);
             });
         }
-    }
-
-    private void updateSection(SectionName value, ArrayList<MovieResultData> items) {
-        switch (value) {
-            case TRENDING_SECTION:
-                trendingAdapter.updateItemsList(items);
-                viewModel.showTrendingSection.set(trendingAdapter.getItemCount() > 0);
-                break;
-            case NOW_PLAYING_SECTION:
-                nowPlayingAdapter.updateItemsList(items);
-                viewModel.showNowPlayingSection.set(nowPlayingAdapter.getItemCount() > 0);
-                break;
-            default:
-        }
+        viewModel.getBookmarkedMovieIds().observe(getViewLifecycleOwner(), values -> {
+            viewModel.handleBookmarkedMovies(values);
+        });
     }
 
     void showToast(String message) {
@@ -80,6 +62,14 @@ public class ListingFragment extends BaseFragment<ListingViewModel, FragmentList
     @Override
     protected void handleEvents(EventData event) {
         switch (event.getEventId()) {
+            case UPDATE_TRENDING_DATA:
+                trendingAdapter.updateItemsList((ArrayList<MovieCardViewModel>) event.getData());
+                viewModel.showTrendingSection.set(trendingAdapter.getItemCount() > 0);
+                break;
+            case UPDATE_NOW_PLAYING_DATA:
+                nowPlayingAdapter.updateItemsList((ArrayList<MovieCardViewModel>) event.getData());
+                viewModel.showNowPlayingSection.set(nowPlayingAdapter.getItemCount() > 0);
+                break;
             case API_ERROR:
                 showToast(getResources().getString(R.string.api_error_message));
                 break;

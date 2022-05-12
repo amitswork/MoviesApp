@@ -7,14 +7,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.movieapp.databinding.MovieItemLayoutBinding;
-import com.example.movieapp.listing.model.response.MovieResultData;
 import com.example.movieapp.listing.viewholder.MovieViewHolder;
+import com.example.movieapp.listing.viewmodel.MovieCardViewModel;
 
 import java.util.ArrayList;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieViewHolder> {
 
-    ArrayList<MovieResultData> itemList;
+    ArrayList<MovieCardViewModel> itemList;
 
     public MovieAdapter() {
         itemList = new ArrayList<>();
@@ -37,14 +37,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieViewHolder> {
         return itemList.size();
     }
 
-    public void addItemsList(ArrayList<MovieResultData> items) {
-        int oldCount = itemList.size();
-        itemList.addAll(items);
-        int newCount = itemList.size();
-        notifyItemRangeInserted(oldCount, newCount);
-    }
-
-    public void updateItemsList(ArrayList<MovieResultData> items) {
+    public void updateItemsList(ArrayList<MovieCardViewModel> items) {
         itemList.clear();
         itemList.addAll(items);
         notifyDataSetChanged();

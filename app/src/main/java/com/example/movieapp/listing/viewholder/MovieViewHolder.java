@@ -3,7 +3,7 @@ package com.example.movieapp.listing.viewholder;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.movieapp.databinding.MovieItemLayoutBinding;
-import com.example.movieapp.listing.model.response.MovieResultData;
+import com.example.movieapp.listing.viewmodel.MovieCardViewModel;
 
 public class MovieViewHolder extends RecyclerView.ViewHolder {
 
@@ -14,7 +14,7 @@ public class MovieViewHolder extends RecyclerView.ViewHolder {
         this.binding = binding;
     }
 
-    public void onBind(MovieResultData data) {
+    public void onBind(MovieCardViewModel data) {
         binding.setModel(data);
         binding.executePendingBindings();
     }

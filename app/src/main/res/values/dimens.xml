@@ -9,4 +9,5 @@
 
     <dimen name="movie_card_width">120dp</dimen>
     <dimen name="movie_card_height">180dp</dimen>
+    <dimen name="bookmark_image_dimen">22dp</dimen>
 </resources>

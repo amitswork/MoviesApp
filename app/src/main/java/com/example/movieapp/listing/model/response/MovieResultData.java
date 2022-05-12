@@ -21,6 +21,10 @@ public class MovieResultData {
     @SerializedName("overview")
     String overview;
 
+    public String getId() {
+        return id;
+    }
+
     public String getPosterPath() {
         return posterPath;
     }

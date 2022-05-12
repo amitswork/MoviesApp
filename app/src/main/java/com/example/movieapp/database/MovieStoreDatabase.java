@@ -8,15 +8,17 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 import com.example.movieapp.database.converter.MovieDataConverter;
+import com.example.movieapp.database.dao.BookmarkDao;
 import com.example.movieapp.database.dao.MoviesDao;
+import com.example.movieapp.database.entity.BookmarkEntity;
 import com.example.movieapp.database.entity.MoviesDbEntity;
 
-@Database(entities = {MoviesDbEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {MoviesDbEntity.class, BookmarkEntity.class}, version = 1, exportSchema = false)
 @TypeConverters(value = {MovieDataConverter.class})
 public abstract class MovieStoreDatabase extends RoomDatabase {
 
     public abstract MoviesDao moviesDao();
-
+    public abstract BookmarkDao bookmarkDao();
 
     private static final String DB_NAME = "movieDatabase.db";
 

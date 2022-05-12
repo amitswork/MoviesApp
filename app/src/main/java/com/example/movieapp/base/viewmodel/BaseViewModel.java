@@ -25,6 +25,10 @@ public class BaseViewModel extends ViewModel {
         eventStream.postValue(eventData);
     }
 
+    protected void setEventStream(EventData eventData) {
+        eventStream.setValue(eventData);
+    }
+
     public void clearEventStream() {
         eventStream.postValue(new EventData(""));
     }
