@@ -1,6 +1,8 @@
 package com.example.movieapp.listing.ui;
 
 import static com.example.movieapp.listing.events.ListingEvents.API_ERROR;
+import static com.example.movieapp.listing.events.ListingEvents.BOOKMARK_ICON_CLICK;
+import static com.example.movieapp.listing.events.ListingEvents.SEARCH_ICON_CLICK;
 import static com.example.movieapp.listing.events.ListingEvents.UPDATE_NOW_PLAYING_DATA;
 import static com.example.movieapp.listing.events.ListingEvents.UPDATE_TRENDING_DATA;
 
@@ -19,9 +21,11 @@ import com.example.movieapp.databinding.FragmentListingLayoutBinding;
 import com.example.movieapp.listing.adapter.MovieAdapter;
 import com.example.movieapp.listing.helper.PaginationScroller;
 import com.example.movieapp.listing.helper.SectionName;
+import com.example.movieapp.listing.viewmodel.HeaderObservable;
 import com.example.movieapp.listing.viewmodel.ListingViewModel;
 import com.example.movieapp.listing.viewmodel.MovieCardViewModel;
 import com.example.movieapp.main.ui.MainActivity;
+import com.example.movieapp.main.viewmodel.ActivitySharedViewModel;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -36,12 +40,15 @@ public class ListingFragment extends BaseFragment<ListingViewModel, FragmentList
     MovieAdapter trendingAdapter = new MovieAdapter();
     MovieAdapter nowPlayingAdapter = new MovieAdapter();
 
+    HeaderObservable headerObservable;
+
     @Inject
     ViewModelFactory factory;
 
     @Override
     protected void initFragment() {
         addSectionObservers();
+        headerObservable = new HeaderObservable(viewModel.getEventStream());
     }
 
     private void addSectionObservers() {
@@ -73,6 +80,10 @@ public class ListingFragment extends BaseFragment<ListingViewModel, FragmentList
             case API_ERROR:
                 showToast(getResources().getString(R.string.api_error_message));
                 break;
+            case BOOKMARK_ICON_CLICK:
+            case SEARCH_ICON_CLICK:
+                sendEventToActivity(event);
+                break;
             default: break;
         }
     }
@@ -80,6 +91,7 @@ public class ListingFragment extends BaseFragment<ListingViewModel, FragmentList
     @Override
     protected void setDataBinding() {
         binding.setModel(viewModel);
+        binding.setHeaderObservable(headerObservable);
         bindTrendingRecyclerView();
         bindNowPlayingRecyclerView();
         binding.executePendingBindings();

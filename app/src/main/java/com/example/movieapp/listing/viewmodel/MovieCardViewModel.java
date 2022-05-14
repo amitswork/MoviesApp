@@ -45,9 +45,9 @@ public class MovieCardViewModel {
 
     private void updateBookmarkedItemInDB() {
         if (isBookmarked.get()) {
-            repository.saveBookmarkedItem(data.getId());
+            repository.saveBookmarkedItem(data);
         } else {
-            repository.deleteBookmarkedItem(data.getId());
+            repository.deleteBookmarkedItem(data);
         }
     }
 

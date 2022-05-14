@@ -1,15 +1,15 @@
-package com.example.movieapp.listing.viewholder;
+package com.example.movieapp.bookmarkscreen.viewholder;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.movieapp.databinding.MovieCardWithBookmarkLayoutBinding;
+import com.example.movieapp.databinding.MovieCardLayoutBinding;
 import com.example.movieapp.listing.viewmodel.MovieCardViewModel;
 
-public class MovieViewHolder extends RecyclerView.ViewHolder {
+public class MovieCardViewHolder extends RecyclerView.ViewHolder {
 
-    MovieCardWithBookmarkLayoutBinding binding;
+    MovieCardLayoutBinding binding;
 
-    public MovieViewHolder(MovieCardWithBookmarkLayoutBinding binding) {
+    public MovieCardViewHolder(MovieCardLayoutBinding binding) {
         super(binding.getRoot());
         this.binding = binding;
     }

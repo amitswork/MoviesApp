@@ -8,6 +8,7 @@ import androidx.room.Query;
 
 import com.example.movieapp.database.entity.BookmarkEntity;
 import com.example.movieapp.listing.constants.BookMarkItemType;
+import com.example.movieapp.listing.model.response.MovieResultData;
 
 import java.util.List;
 
@@ -20,7 +21,10 @@ public interface BookmarkDao {
     @Query("delete from BookmarkDb where itemId = :itemId")
     void deleteItem(String itemId);
 
-    @Query("select itemId from BookmarkDb where type = :type")
-    LiveData<List<String>> getAllItems(BookMarkItemType type);
+    @Query("select data from BookmarkDb where type = :type")
+    LiveData<List<MovieResultData>> getAllItemsLiveData(BookMarkItemType type);
+
+    @Query("select data from BookmarkDb where type = :type")
+    List<MovieResultData> getAllItems(BookMarkItemType type);
 
 }

@@ -9,4 +9,5 @@
     <color name="half_transparent_black">#77000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FF0000</color>
+    <color name="header_red">#C72300</color>
 </resources>

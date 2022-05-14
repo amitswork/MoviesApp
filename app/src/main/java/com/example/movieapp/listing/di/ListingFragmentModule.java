@@ -42,15 +42,5 @@ public class ListingFragmentModule {
         return new BookmarkRepositoryImpl(database);
     }
 
-    @Provides
-    ListingResponseConverter providesListingConverter() {
-        return new ListingResponseConverter();
-    }
-
-    @Provides
-    MovieStoreDatabase providesMovieDatabase() {
-        return MovieStoreDatabase.getInstance();
-    }
-
 
 }

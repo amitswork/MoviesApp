@@ -4,8 +4,6 @@ import static com.example.movieapp.listing.events.ListingEvents.API_ERROR;
 import static com.example.movieapp.listing.events.ListingEvents.UPDATE_NOW_PLAYING_DATA;
 import static com.example.movieapp.listing.events.ListingEvents.UPDATE_TRENDING_DATA;
 
-import static java.sql.DriverManager.println;
-
 import androidx.databinding.ObservableBoolean;
 import androidx.lifecycle.LiveData;
 
@@ -14,6 +12,7 @@ import com.example.movieapp.base.viewmodel.BaseViewModel;
 import com.example.movieapp.listing.constants.BookMarkItemType;
 import com.example.movieapp.listing.helper.ListingResponseConverter;
 import com.example.movieapp.listing.helper.SectionName;
+import com.example.movieapp.listing.model.response.MovieResultData;
 import com.example.movieapp.listing.model.response.MoviesResponse;
 import com.example.movieapp.listing.repository.BookmarkRepository;
 import com.example.movieapp.listing.repository.ListingRepository;
@@ -25,7 +24,6 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class ListingViewModel extends BaseViewModel {
@@ -126,12 +124,8 @@ public class ListingViewModel extends BaseViewModel {
         return repository.getSectionMoviesFromDb(sectionName);
     }
 
-    public LiveData<List<String>> getBookmarkedMovieIds() {
-        return bookmarkRepository.getAllBookmarkedItemIds(BookMarkItemType.MOVIE);
-    }
-
-    public ArrayList<MovieCardViewModel> convertToMoviesResultData(MoviesResponse moviesResponses) {
-        return converter.convertToUiData(moviesResponses);
+    public LiveData<List<MovieResultData>> getBookmarkedMovieIds() {
+        return bookmarkRepository.getAllBookmarkedItemsLiveData(BookMarkItemType.MOVIE);
     }
 
     public void handleSectionsUpdate(SectionName sectionName, MoviesResponse moviesResponses) {
@@ -155,7 +149,7 @@ public class ListingViewModel extends BaseViewModel {
     }
 
     void updateSectionResponse(SectionName sectionName, MoviesResponse moviesResponses) {
-        ArrayList<MovieCardViewModel> convertedResponse = convertToMoviesResultData(moviesResponses);
+        ArrayList<MovieCardViewModel> convertedResponse = converter.convertToUiData(moviesResponses.getResults());
         uiItemsMap.put(sectionName, convertedResponse);
         updateBookmarkedCards();
         switch (sectionName) {
@@ -173,7 +167,12 @@ public class ListingViewModel extends BaseViewModel {
         }
     }
 
-    public void handleBookmarkedMovies(List<String> bookmarkedMovieIds) {
+    public void handleBookmarkedMovies(List<MovieResultData> itemList) {
+        List<String> bookmarkedMovieIds = new ArrayList<>();
+        for (MovieResultData item : itemList) {
+            bookmarkedMovieIds.add(item.getId());
+        }
+
         updateBookmarkedMovieIds(bookmarkedMovieIds);
         updateBookmarkedCards();
     }

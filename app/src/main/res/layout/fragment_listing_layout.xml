@@ -14,25 +14,35 @@
         <variable
             name="nowPlayingAdapter"
             type="com.example.movieapp.listing.adapter.MovieAdapter" />
+
+        <variable
+            name="headerObservable"
+            type="com.example.movieapp.listing.viewmodel.HeaderObservable" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black"
-        android:paddingVertical="@dimen/margin_large">
+        android:background="@color/black">
+
+        <include android:id="@+id/header"
+            layout="@layout/header_layout"
+            app:model="@{headerObservable}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/trending_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
             android:layout_marginStart="@dimen/margin_large"
             android:text="@string/trending_movies_title"
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_large"
             android:fontFamily="sans-serif-black"
             app:visibleGone="@{model.showTrendingSection}"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header"
             app:layout_constraintStart_toStartOf="parent"/>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -49,7 +59,7 @@
             app:layout_constraintTop_toBottomOf="@id/trending_title"
             app:layout_constraintStart_toStartOf="parent"
             tools:itemCount="10"
-            tools:listitem="@layout/movie_item_layout" />
+            tools:listitem="@layout/movie_card_with_bookmark_layout" />
 
         <TextView
             android:id="@+id/now_playing_title"
@@ -79,7 +89,7 @@
             app:layout_constraintTop_toBottomOf="@id/now_playing_title"
             app:layout_constraintStart_toStartOf="parent"
             tools:itemCount="10"
-            tools:listitem="@layout/movie_item_layout" />
+            tools:listitem="@layout/movie_card_with_bookmark_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

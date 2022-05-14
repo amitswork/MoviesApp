@@ -1,4 +1,4 @@
-package com.example.movieapp.listing.adapter;
+package com.example.movieapp.bookmarkscreen.adapter;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -6,30 +6,29 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.movieapp.databinding.MovieCardWithBookmarkLayoutBinding;
-import com.example.movieapp.listing.viewholder.MovieViewHolder;
+import com.example.movieapp.bookmarkscreen.viewholder.MovieCardViewHolder;
+import com.example.movieapp.databinding.MovieCardLayoutBinding;
 import com.example.movieapp.listing.viewmodel.MovieCardViewModel;
 
 import java.util.ArrayList;
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieViewHolder> {
+public class BookmarkCardAdapter extends RecyclerView.Adapter<MovieCardViewHolder> {
 
     ArrayList<MovieCardViewModel> itemList;
 
-    public MovieAdapter() {
+    public BookmarkCardAdapter() {
         itemList = new ArrayList<>();
     }
 
     @NonNull
     @Override
-    public MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        MovieCardWithBookmarkLayoutBinding binding = MovieCardWithBookmarkLayoutBinding
-                .inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new MovieViewHolder(binding);
+    public MovieCardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        MovieCardLayoutBinding binding = MovieCardLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new MovieCardViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MovieCardViewHolder holder, int position) {
         holder.onBind(itemList.get(position));
     }
 
