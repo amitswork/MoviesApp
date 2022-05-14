@@ -27,12 +27,6 @@ public class ListingFragmentModule {
     }
 
     @Provides
-    ApiService providesApiService() {
-        return RetrofitClient.getInstance()
-                .create(ApiService.class);
-    }
-
-    @Provides
     ListingRepository providesListingRepository(ApiService apiService, MovieStoreDatabase database) {
         return new ListingRepositoryImpl(apiService, database);
     }

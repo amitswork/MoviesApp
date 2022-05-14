@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="model"
+            type="com.example.movieapp.searchscreen.viewmodel.SearchFragmentViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/black">
+
+        <include android:id="@+id/header"
+            layout="@layout/common_header"
+            app:heading="@{@string/search_screen_title}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="center_vertical"
+            android:padding="@dimen/margin_large"
+            android:hint="@string/search_edit_text_hint"
+            android:textSize="@dimen/text_size_small"
+            app:roundedCorner="@{20f}"
+            android:layout_margin="@dimen/margin_large"
+            android:background="@color/white"
+            app:requestFocus="@{true}"
+            app:layout_constraintTop_toBottomOf="@id/header"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/red"
+            android:layout_marginTop="@dimen/margin_large"
+            app:layout_constraintTop_toBottomOf="@id/search_view"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:padding="@dimen/margin_large"
+            android:clipToPadding="false"
+            app:visibleGone="@{!model.showError}"
+            tools:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/searched_movie_item_layout"
+            app:layout_constraintTop_toBottomOf="@id/divider"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/error_text"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:visibleGone="@{model.showError}"
+            android:gravity="center"
+            android:text="@string/no_hotels_found"
+            android:textColor="@color/white"
+            android:textSize="@dimen/title_text_size"
+            android:fontFamily="sans-serif-black"
+            app:layout_constraintTop_toBottomOf="@id/divider"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <ProgressBar
+            android:layout_width="@dimen/loader_icon_size_small"
+            android:layout_height="@dimen/loader_icon_size_small"
+            android:layout_marginEnd="@dimen/margin_large"
+            android:layout_gravity="center"
+            app:visibleGone="@{model.showLoader}"
+            app:layout_constraintTop_toTopOf="@id/search_view"
+            app:layout_constraintBottom_toBottomOf="@id/search_view"
+            app:layout_constraintEnd_toEndOf="@id/search_view"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

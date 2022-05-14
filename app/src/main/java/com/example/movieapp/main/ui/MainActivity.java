@@ -18,6 +18,7 @@ import com.example.movieapp.listing.ui.ListingFragment;
 import com.example.movieapp.main.di.DaggerMainActivityComponent;
 import com.example.movieapp.main.di.MainActivityComponent;
 import com.example.movieapp.main.viewmodel.ActivitySharedViewModel;
+import com.example.movieapp.searchscreen.ui.SearchFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,7 +52,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openSearchFragment() {
-
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, SearchFragment.getInstance(), SearchFragment.TAG)
+                .addToBackStack(SearchFragment.TAG)
+                .commit();
     }
 
     private void openBookmarkFragment() {

@@ -4,6 +4,7 @@ import com.example.movieapp.base.di.BaseModule;
 import com.example.movieapp.bookmarkscreen.di.BookmarkFragmentComponent;
 import com.example.movieapp.listing.di.ListingFragmentComponent;
 import com.example.movieapp.main.ui.MainActivity;
+import com.example.movieapp.searchscreen.di.SearchFragmentComponent;
 
 import dagger.Component;
 
@@ -14,6 +15,7 @@ public interface MainActivityComponent {
 
     ListingFragmentComponent.Builder buildListingFragment();
     BookmarkFragmentComponent.Builder buildBookmarkFragment();
+    SearchFragmentComponent.Builder buildSearchFragment();
 
     @Component.Builder
     interface Builder {

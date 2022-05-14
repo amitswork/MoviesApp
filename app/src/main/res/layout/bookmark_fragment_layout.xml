@@ -7,18 +7,11 @@
         android:layout_height="match_parent"
         android:background="@color/black">
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/header_height"
-            android:gravity="center"
-            android:text="@string/bookmark_screen_title"
-            android:background="@color/header_red"
-            android:textColor="@color/white"
-            android:fontFamily="sans-serif-black"
-            android:textSize="@dimen/title_text_size"
+        <include android:id="@+id/header"
+            layout="@layout/common_header"
+            app:heading="@{@string/bookmark_screen_title}"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
@@ -28,7 +21,7 @@
             android:clipToPadding="false"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toBottomOf="@id/title"
+            app:layout_constraintTop_toBottomOf="@id/header"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:listitem="@layout/movie_card_layout"/>
 

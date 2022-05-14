@@ -6,16 +6,14 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class EndDividerItemDecorator extends RecyclerView.ItemDecoration {
+public class BottomDividerItemDecoration extends EndDividerItemDecorator {
 
-    Integer offset;
-
-    public EndDividerItemDecorator(Integer offset) {
-        this.offset = offset;
+    public BottomDividerItemDecoration(Integer offset) {
+        super(offset);
     }
 
     @Override
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-        outRect.right = offset;
+        outRect.bottom = offset;
     }
 }

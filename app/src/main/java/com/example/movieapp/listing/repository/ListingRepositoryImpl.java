@@ -16,6 +16,8 @@ public class ListingRepositoryImpl implements ListingRepository {
     ApiService apiService;
     MovieStoreDatabase database;
 
+    String apiKey = BuildConfig.API_KEY;
+
     public ListingRepositoryImpl(ApiService apiService, MovieStoreDatabase database) {
         this.apiService = apiService;
         this.database = database;
@@ -23,12 +25,12 @@ public class ListingRepositoryImpl implements ListingRepository {
 
     @Override
     public Observable<MoviesResponse> fetchTrendingMovies(String page) {
-        return apiService.getTrendingMovies(BuildConfig.API_KEY, page);
+        return apiService.getTrendingMovies(apiKey, page);
     }
 
     @Override
     public Observable<MoviesResponse> fetchNowPlayingMovies(String page) {
-        return apiService.getNowPlayingMovies(BuildConfig.API_KEY, page);
+        return apiService.getNowPlayingMovies(apiKey, page);
     }
 
     @Override

@@ -1,5 +1,8 @@
 package com.example.movieapp.common.binding;
 
+import static com.example.movieapp.main.ui.MovieApp.appContext;
+
+import android.content.Context;
 import android.graphics.ColorFilter;
 import android.graphics.Outline;
 import android.graphics.PorterDuff;
@@ -7,8 +10,12 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
+import androidx.annotation.DrawableRes;
 import androidx.databinding.BindingAdapter;
 
 import com.squareup.picasso.Picasso;
@@ -37,7 +44,7 @@ public class BindingAdapters {
         view.setClipToOutline(true);
     }
 
-    @BindingAdapter("imageUrl")
+    @BindingAdapter(value = {"imageUrl"})
     public static void setImage(ImageView view, String imageUrl) {
         Picasso.get().cancelRequest(view);
         Picasso.get()
@@ -53,6 +60,15 @@ public class BindingAdapters {
         ColorFilter colorFilter = new PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY);
         drawable.setColorFilter(colorFilter);
         view.setImageDrawable(drawable);
+    }
+
+    @BindingAdapter(value = {"requestFocus"})
+    public static void requestFocus(View view, Boolean requestFocus) {
+        if (requestFocus) {
+            view.requestFocus();
+            InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
 
 }
