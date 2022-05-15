@@ -4,12 +4,15 @@ import static com.example.movieapp.listing.events.ListingEvents.API_ERROR;
 import static com.example.movieapp.listing.events.ListingEvents.UPDATE_NOW_PLAYING_DATA;
 import static com.example.movieapp.listing.events.ListingEvents.UPDATE_TRENDING_DATA;
 
+import android.util.Log;
+
 import androidx.databinding.ObservableBoolean;
 import androidx.lifecycle.LiveData;
 
 import com.example.movieapp.base.model.EventData;
 import com.example.movieapp.base.viewmodel.BaseViewModel;
 import com.example.movieapp.listing.constants.BookMarkItemType;
+import com.example.movieapp.listing.datamodel.SectionResponseWrapper;
 import com.example.movieapp.listing.helper.ListingResponseConverter;
 import com.example.movieapp.listing.helper.SectionName;
 import com.example.movieapp.listing.model.response.MovieResultData;
@@ -35,13 +38,7 @@ public class ListingViewModel extends BaseViewModel {
     public ObservableBoolean showTrendingSection = new ObservableBoolean(false);
     public ObservableBoolean showNowPlayingSection = new ObservableBoolean(false);
 
-    MoviesResponse trendingSectionResponse;
-    int lastTrendingSectionPageRequested = 0;
-
-    MoviesResponse nowPlayingSectionResponse;
-    int lastNowPlayingSectionPageRequested = 0;
-
-    HashMap<SectionName, ArrayList<MovieCardViewModel>> uiItemsMap = new HashMap<>();
+    HashMap<SectionName, SectionResponseWrapper> sectionDataMap = new HashMap<>();
 
     HashSet<String> bookmarkedMovieIds = new HashSet<>();
 
@@ -50,66 +47,54 @@ public class ListingViewModel extends BaseViewModel {
         this.repository = repository;
         this.converter = converter;
         this.bookmarkRepository = bookmarkRepository;
+        initSectionsMap();
     }
 
-    public void fetchTrendingMovies() {
-        if (checkIfTrendingSectionAlreadyRequested()) {
+    private void initSectionsMap() {
+        for (SectionName section : SectionName.values()) {
+            sectionDataMap.put(section, new SectionResponseWrapper());
+        }
+    }
+
+    public void fetchMovies(SectionName section, Boolean replaceCache) {
+        SectionResponseWrapper dataWrapper = sectionDataMap.get(section);
+        if (dataWrapper == null || checkIfSectionAlreadyRequested(dataWrapper)) {
             return;
         }
-        lastTrendingSectionPageRequested ++;
-        Disposable disposable = repository.fetchTrendingMovies(Integer.toString(lastTrendingSectionPageRequested))
+        dataWrapper.lastPageRequested ++;
+        Disposable disposable = repository.fetchMovies(section, Integer.toString(dataWrapper.lastPageRequested))
                 .map(response -> {
-                    trendingSectionResponse = mergeResponse(trendingSectionResponse, response);
-                    repository.syncDbWithServerResponseForSection(SectionName.TRENDING_SECTION, trendingSectionResponse);
+                    if (replaceCache) {
+                        dataWrapper.lastFetchedResponse = response;
+                    } else {
+                        dataWrapper.lastFetchedResponse = mergeResponse(dataWrapper.lastFetchedResponse, response);
+                    }
+                    repository.syncDbWithServerResponseForSection(section, dataWrapper.lastFetchedResponse);
                     return response;
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(movieResultData -> { }, e -> {
-                    lastTrendingSectionPageRequested --;
-                    setEventStream(new EventData(API_ERROR));
+                    dataWrapper.lastPageRequested --;
+                    //setEventStream(new EventData(API_ERROR));
                 });
 
         addDisposable(disposable);
     }
 
-    private boolean checkIfTrendingSectionAlreadyRequested() {
-        return (lastTrendingSectionPageRequested > 0 && trendingSectionResponse == null)
-                || (trendingSectionResponse != null && lastTrendingSectionPageRequested > trendingSectionResponse.getPage());
+    private boolean checkIfSectionAlreadyRequested(SectionResponseWrapper dataWrapper) {
+        return (dataWrapper.lastPageRequested > 0 && dataWrapper.lastFetchedResponse == null)
+                || (dataWrapper.lastFetchedResponse != null && dataWrapper.lastPageRequested > dataWrapper.lastFetchedResponse.getPage());
     }
 
-    public MoviesResponse getTrendingSectionResponse() {
-        return trendingSectionResponse;
+    public MoviesResponse getSectionResponse(SectionName sectionName) {
+        SectionResponseWrapper dataWrapper = sectionDataMap.get(sectionName);
+        return dataWrapper == null ? null : dataWrapper.lastFetchedResponse;
     }
 
-    public void fetchNowPlayingMovies() {
-        if (checkIfNowPlayingSectionAlreadyRequested()) {
-            return;
-        }
-        lastNowPlayingSectionPageRequested ++;
-        Disposable disposable = repository.fetchNowPlayingMovies(Integer.toString(lastNowPlayingSectionPageRequested))
-                .map(response -> {
-                    nowPlayingSectionResponse = mergeResponse(nowPlayingSectionResponse, response);
-                    repository.syncDbWithServerResponseForSection(SectionName.NOW_PLAYING_SECTION, nowPlayingSectionResponse);
-                    return response;
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(movieResultData -> { }, e -> {
-                    lastNowPlayingSectionPageRequested --;
-                    setEventStream(new EventData(API_ERROR));
-                });
-
-        addDisposable(disposable);
-    }
-
-    private boolean checkIfNowPlayingSectionAlreadyRequested() {
-        return (lastNowPlayingSectionPageRequested > 0 && nowPlayingSectionResponse == null)
-                || (nowPlayingSectionResponse != null && lastNowPlayingSectionPageRequested > nowPlayingSectionResponse.getPage());
-    }
-
-    public MoviesResponse getNowPlayingSectionResponse() {
-        return nowPlayingSectionResponse;
+    public boolean isSectionComplete(SectionName sectionName) {
+        MoviesResponse response = getSectionResponse(sectionName);
+        return response != null && response.isResponseComplete();
     }
 
     private MoviesResponse mergeResponse(MoviesResponse oldResponse, MoviesResponse newResponse) {
@@ -129,38 +114,29 @@ public class ListingViewModel extends BaseViewModel {
     }
 
     public void handleSectionsUpdate(SectionName sectionName, MoviesResponse moviesResponses) {
-        if (moviesResponses == null) {
-            fetchDataFromServerFor(sectionName);
-        } else {
+        if (moviesResponses != null) {
             updateSectionResponse(sectionName, moviesResponses);
         }
     }
 
-    void fetchDataFromServerFor(SectionName sectionName) {
-        switch (sectionName) {
-            case TRENDING_SECTION:
-                fetchTrendingMovies();
-                break;
-            case NOW_PLAYING_SECTION:
-                fetchNowPlayingMovies();
-                break;
-            default:
-        }
+    void updateSectionResponse(SectionName sectionName, MoviesResponse moviesResponses) {
+        SectionResponseWrapper dataWrapper = sectionDataMap.get(sectionName);
+        if (dataWrapper == null) return;
+        ArrayList<MovieCardViewModel> convertedResponse = converter.convertToUiData(moviesResponses.getResults(), getEventStream());
+        dataWrapper.uiItems = convertedResponse;
+        dataWrapper.lastFetchedResponse = moviesResponses;
+        dataWrapper.lastPageRequested = moviesResponses.getPage();
+
+        updateBookmarkedCards();
+        notifyUiUpdate(sectionName, convertedResponse);
     }
 
-    void updateSectionResponse(SectionName sectionName, MoviesResponse moviesResponses) {
-        ArrayList<MovieCardViewModel> convertedResponse = converter.convertToUiData(moviesResponses.getResults(), getEventStream());
-        uiItemsMap.put(sectionName, convertedResponse);
-        updateBookmarkedCards();
+    private void notifyUiUpdate(SectionName sectionName, ArrayList<MovieCardViewModel> convertedResponse) {
         switch (sectionName) {
             case TRENDING_SECTION:
-                trendingSectionResponse = moviesResponses;
-                lastTrendingSectionPageRequested = moviesResponses.getPage();
                 setEventStream(new EventData(UPDATE_TRENDING_DATA, convertedResponse));
                 break;
             case NOW_PLAYING_SECTION:
-                nowPlayingSectionResponse = moviesResponses;
-                lastNowPlayingSectionPageRequested = moviesResponses.getPage();
                 setEventStream(new EventData(UPDATE_NOW_PLAYING_DATA, convertedResponse));
                 break;
             default:
@@ -183,7 +159,8 @@ public class ListingViewModel extends BaseViewModel {
     }
 
     private void updateBookmarkedCards() {
-        for (ArrayList<MovieCardViewModel> sectionCards : uiItemsMap.values()) {
+        for (SectionResponseWrapper sectionWrapper : sectionDataMap.values()) {
+            ArrayList<MovieCardViewModel> sectionCards = sectionWrapper.uiItems;
             for (MovieCardViewModel card : sectionCards) {
                 boolean isBookmarked = bookmarkedMovieIds.contains(card.data.getId());
                 card.updateBookmark(isBookmarked);

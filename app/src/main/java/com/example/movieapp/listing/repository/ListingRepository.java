@@ -8,6 +8,7 @@ import com.example.movieapp.listing.model.response.MoviesResponse;
 import io.reactivex.Observable;
 
 public interface ListingRepository {
+    public Observable<MoviesResponse> fetchMovies(SectionName section, String page);
     public Observable<MoviesResponse> fetchTrendingMovies(String page);
     public Observable<MoviesResponse> fetchNowPlayingMovies(String page);
 

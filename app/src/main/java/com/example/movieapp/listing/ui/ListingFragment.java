@@ -4,6 +4,7 @@ import static com.example.movieapp.listing.events.ListingEvents.API_ERROR;
 import static com.example.movieapp.listing.events.ListingEvents.UPDATE_NOW_PLAYING_DATA;
 import static com.example.movieapp.listing.events.ListingEvents.UPDATE_TRENDING_DATA;
 
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -18,6 +19,7 @@ import com.example.movieapp.databinding.FragmentListingLayoutBinding;
 import com.example.movieapp.listing.adapter.MovieAdapter;
 import com.example.movieapp.listing.helper.PaginationScroller;
 import com.example.movieapp.listing.helper.SectionName;
+import com.example.movieapp.listing.model.response.MoviesResponse;
 import com.example.movieapp.listing.viewmodel.HeaderObservable;
 import com.example.movieapp.listing.viewmodel.ListingViewModel;
 import com.example.movieapp.listing.viewmodel.MovieCardViewModel;
@@ -41,8 +43,15 @@ public class ListingFragment extends BaseFragment<ListingViewModel, FragmentList
 
     @Override
     protected void initFragment() {
+        refreshSectionsFromServer();
         addSectionObservers();
         headerObservable = new HeaderObservable(viewModel.getEventStream());
+    }
+
+    private void refreshSectionsFromServer() {
+        for (SectionName section : SectionName.values()) {
+            viewModel.fetchMovies(section, true);
+        }
     }
 
     private void addSectionObservers() {
@@ -94,12 +103,12 @@ public class ListingFragment extends BaseFragment<ListingViewModel, FragmentList
         binding.trendingRecycler.addOnScrollListener(new PaginationScroller((LinearLayoutManager) binding.trendingRecycler.getLayoutManager()) {
             @Override
             protected void loadMoreItems() {
-                viewModel.fetchTrendingMovies();
+                viewModel.fetchMovies(SectionName.TRENDING_SECTION, false);
             }
 
             @Override
             public boolean isLastPage() {
-                return viewModel.getTrendingSectionResponse().isResponseComplete();
+                return viewModel.isSectionComplete(SectionName.TRENDING_SECTION);
             }
         });
     }
@@ -111,12 +120,12 @@ public class ListingFragment extends BaseFragment<ListingViewModel, FragmentList
         binding.nowPlayingRecycler.addOnScrollListener(new PaginationScroller((LinearLayoutManager) binding.nowPlayingRecycler.getLayoutManager()) {
             @Override
             protected void loadMoreItems() {
-                viewModel.fetchNowPlayingMovies();
+                viewModel.fetchMovies(SectionName.NOW_PLAYING_SECTION, false);
             }
 
             @Override
             public boolean isLastPage() {
-                return viewModel.getNowPlayingSectionResponse().isResponseComplete();
+                return viewModel.isSectionComplete(SectionName.NOW_PLAYING_SECTION);
             }
         });
     }

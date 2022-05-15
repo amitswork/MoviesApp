@@ -50,16 +50,10 @@ public class DetailFragment extends BaseFragment<DetailFragmentViewModel, Detail
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
 
-        String deeplink = createDetailDeeplink();
+        String deeplink = CommonUtil.createDetailDeeplink(viewModel.data);
 
         intent.putExtra(Intent.EXTRA_TEXT, deeplink);
         startActivity(intent);
-    }
-
-    private String createDetailDeeplink() {
-        String jsonData = CommonUtil.convertToJson(viewModel.data);
-        String data = Uri.encode(jsonData);
-        return BASE_PATH + DETAIL_PAGE_PATH + START_QUERY_PARAM + DATA_PARAM + data;
     }
 
     @Override

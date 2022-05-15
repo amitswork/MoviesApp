@@ -1,6 +1,5 @@
 package com.example.movieapp.main.helper;
 
-import static com.example.movieapp.common.constants.PagePaths.DATA_PARAM;
 import static com.example.movieapp.common.constants.PagePaths.DATA_PARAM_KEY;
 import static com.example.movieapp.common.constants.PagePaths.DETAIL_PAGE_PATH;
 import static com.example.movieapp.main.event.MainActivityEvents.OPEN_DETAILS_PAGE;

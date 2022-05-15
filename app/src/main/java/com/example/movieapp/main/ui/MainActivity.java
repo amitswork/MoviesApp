@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        parser.parseIntent(getIntent());
+        parser.parseIntent(intent);
     }
 
     private void handleEvents(EventData event) {
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private void openSearchFragment() {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, SearchFragment.getInstance(), SearchFragment.TAG)
+                .add(R.id.container, SearchFragment.getInstance(), SearchFragment.TAG)
                 .addToBackStack(SearchFragment.TAG)
                 .commit();
     }
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
     private void openBookmarkFragment() {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, BookmarkFragment.getInstance(), BookmarkFragment.TAG)
+                .add(R.id.container, BookmarkFragment.getInstance(), BookmarkFragment.TAG)
                 .addToBackStack(BookmarkFragment.TAG)
                 .commit();
     }
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     private void openDetailFragment(MovieResultData data) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, DetailFragment.getInstance(data), DetailFragment.TAG)
+                .add(R.id.container, DetailFragment.getInstance(data), DetailFragment.TAG)
                 .addToBackStack(DetailFragment.TAG)
                 .commit();
     }
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     private void openListingFragment() {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, ListingFragment.getInstance(), ListingFragment.TAG)
+                .add(R.id.container, ListingFragment.getInstance(), ListingFragment.TAG)
                 .addToBackStack(ListingFragment.TAG)
                 .commit();
     }

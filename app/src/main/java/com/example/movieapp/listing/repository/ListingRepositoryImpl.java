@@ -24,6 +24,15 @@ public class ListingRepositoryImpl implements ListingRepository {
     }
 
     @Override
+    public Observable<MoviesResponse> fetchMovies(SectionName section, String page) {
+        switch (section) {
+            case TRENDING_SECTION: return fetchTrendingMovies(page);
+            case NOW_PLAYING_SECTION: return fetchNowPlayingMovies(page);
+            default: return Observable.empty();
+        }
+    }
+
+    @Override
     public Observable<MoviesResponse> fetchTrendingMovies(String page) {
         return apiService.getTrendingMovies(apiKey, page);
     }

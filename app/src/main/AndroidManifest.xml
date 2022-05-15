@@ -16,6 +16,7 @@
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         <activity
             android:name=".main.ui.MainActivity"
+            android:launchMode="singleTop"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
