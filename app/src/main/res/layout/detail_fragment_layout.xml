@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="model"
+            type="com.example.movieapp.details.viewmodel.DetailFragmentViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black">
+
+        <include android:id="@+id/header"
+            layout="@layout/common_header"
+            app:heading="@{@string/detail_screen_title}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/image"
+            android:layout_width="@dimen/detail_image_size"
+            android:layout_height="@dimen/detail_image_size"
+            android:layout_marginTop="@dimen/margin_large"
+            app:imageUrl="@{model.data.imageUrl}"
+            app:layout_constraintTop_toBottomOf="@id/header"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/share_icon"
+            android:layout_width="@dimen/image_size_huge"
+            android:layout_height="@dimen/image_size_huge"
+            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginEnd="@dimen/margin_large"
+            android:src="@drawable/ic_share_icon"
+            app:layout_constraintTop_toBottomOf="@id/header"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginHorizontal="@dimen/margin_large"
+            tools:text="title"
+            android:text="@{model.data.title}"
+            android:textSize="@dimen/title_text_size"
+            android:textColor="@color/white"
+            android:fontFamily="sans-serif-black"
+            app:layout_constraintTop_toBottomOf="@id/image"/>
+
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_large"
+            tools:text="subtitle"
+            android:text="@{model.data.overview}"
+            android:textSize="@dimen/text_size_large"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

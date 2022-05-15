@@ -32,7 +32,7 @@ public class BookmarkFragmentViewModel extends BaseViewModel {
     public void fetchMovies() {
         Observable.fromCallable(() ->
                 bookmarkRepository.getAllBookmarkedItems(BookMarkItemType.MOVIE)
-        ).map(moviesList -> converter.convertToUiData(moviesList))
+        ).map(moviesList -> converter.convertToUiData(moviesList, getEventStream()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(itemList -> {

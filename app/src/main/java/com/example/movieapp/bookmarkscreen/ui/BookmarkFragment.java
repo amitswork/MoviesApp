@@ -39,7 +39,7 @@ public class BookmarkFragment extends BaseFragment<BookmarkFragmentViewModel, Bo
             case UPDATE_BOOKMARKED_MOVIES:
                 adapter.updateItemsList((ArrayList<MovieCardViewModel>) event.getData());
                 break;
-            default:
+            default: sendEventToActivity(event);
         }
     }
 

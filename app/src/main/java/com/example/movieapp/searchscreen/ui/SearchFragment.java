@@ -42,7 +42,7 @@ public class SearchFragment extends BaseFragment<SearchFragmentViewModel, Search
             case UPDATE_SEARCHED_MOVIES:
                 adapter.updateItemsList((ArrayList<MovieCardViewModel>) event.getData());
                 break;
-            default:
+            default: sendEventToActivity(event);
         }
     }
 

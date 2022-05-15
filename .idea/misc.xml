@@ -12,6 +12,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.24818840579710144" />
         <entry key="app/src/main/res/layout/bookmark_fragment_layout.xml" value="0.19322916666666667" />
         <entry key="app/src/main/res/layout/common_header.xml" value="0.2526041666666667" />
+        <entry key="app/src/main/res/layout/detail_fragment_layout.xml" value="0.24739583333333334" />
         <entry key="app/src/main/res/layout/fragment_listing_layout.xml" value="0.375" />
         <entry key="app/src/main/res/layout/header_layout.xml" value="0.25" />
         <entry key="app/src/main/res/layout/movie_card_layout.xml" value="0.17135416666666667" />

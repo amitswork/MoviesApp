@@ -1,5 +1,8 @@
 package com.example.movieapp.listing.helper;
 
+import androidx.lifecycle.MutableLiveData;
+
+import com.example.movieapp.base.model.EventData;
 import com.example.movieapp.database.MovieStoreDatabase;
 import com.example.movieapp.listing.model.response.MovieResultData;
 import com.example.movieapp.listing.repository.BookmarkRepository;
@@ -18,12 +21,12 @@ public class ListingResponseConverter {
 
     }
 
-    public ArrayList<MovieCardViewModel> convertToUiData(List<MovieResultData> responseItems) {
+    public ArrayList<MovieCardViewModel> convertToUiData(List<MovieResultData> responseItems, MutableLiveData<EventData> eventStream) {
         ArrayList<MovieCardViewModel> items = new ArrayList<>();
         MovieStoreDatabase database = MovieStoreDatabase.getInstance();
         for (MovieResultData movie : responseItems) {
             BookmarkRepository repository = new BookmarkRepositoryImpl(database);
-            MovieCardViewModel card = new MovieCardViewModel(movie, repository);
+            MovieCardViewModel card = new MovieCardViewModel(movie, repository, eventStream);
             items.add(card);
         }
         return items;

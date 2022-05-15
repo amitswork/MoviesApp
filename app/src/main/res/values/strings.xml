@@ -4,6 +4,7 @@
     <string name="now_playing_movies_title">Now Playing Movies</string>
     <string name="api_error_message">Some Error Occurred!</string>
     <string name="bookmark_screen_title">Bookmarked Movies</string>
+    <string name="detail_screen_title">Movie Details</string>
     <string name="search_screen_title">Search Movies</string>
     <string name="search_edit_text_hint">Search a Movie</string>
     <string name="no_hotels_found">No Movies Found!\nPlease try again...</string>

@@ -48,7 +48,7 @@ public class SearchFragmentViewModel extends BaseViewModel {
                 .doOnEach(result -> showLoader.set(false))
                 .doOnError(this::handleError)
                 .observeOn(Schedulers.io())
-                .map(response -> converter.convertToUiData(response.getResults()))
+                .map(response -> converter.convertToUiData(response.getResults(), getEventStream()))
                 .retry()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleSuccess, this::handleError);

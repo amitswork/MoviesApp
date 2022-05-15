@@ -1,7 +1,7 @@
 package com.example.movieapp.listing.viewmodel;
 
-import static com.example.movieapp.listing.events.ListingEvents.BOOKMARK_ICON_CLICK;
-import static com.example.movieapp.listing.events.ListingEvents.SEARCH_ICON_CLICK;
+import static com.example.movieapp.main.event.MainActivityEvents.OPEN_BOOKMARKS_PAGE;
+import static com.example.movieapp.main.event.MainActivityEvents.OPEN_SEARCH_PAGE;
 
 import androidx.lifecycle.MutableLiveData;
 
@@ -16,11 +16,11 @@ public class HeaderObservable {
     }
 
     public void onSearchIconClick() {
-        eventStream.setValue(new EventData(SEARCH_ICON_CLICK));
+        eventStream.setValue(new EventData(OPEN_SEARCH_PAGE));
     }
 
     public void onBookmarkIconClick() {
-        eventStream.setValue(new EventData(BOOKMARK_ICON_CLICK));
+        eventStream.setValue(new EventData(OPEN_BOOKMARKS_PAGE));
     }
 
 }

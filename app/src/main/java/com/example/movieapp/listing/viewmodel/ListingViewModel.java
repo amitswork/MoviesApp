@@ -149,7 +149,7 @@ public class ListingViewModel extends BaseViewModel {
     }
 
     void updateSectionResponse(SectionName sectionName, MoviesResponse moviesResponses) {
-        ArrayList<MovieCardViewModel> convertedResponse = converter.convertToUiData(moviesResponses.getResults());
+        ArrayList<MovieCardViewModel> convertedResponse = converter.convertToUiData(moviesResponses.getResults(), getEventStream());
         uiItemsMap.put(sectionName, convertedResponse);
         updateBookmarkedCards();
         switch (sectionName) {

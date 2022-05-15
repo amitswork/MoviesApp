@@ -14,6 +14,8 @@
     <dimen name="movie_card_height">180dp</dimen>
     <dimen name="bookmark_image_dimen">22dp</dimen>
     <dimen name="loader_icon_size_small">25dp</dimen>
+    <dimen name="detail_image_size">200dp</dimen>
+    <dimen name="image_size_huge">30dp</dimen>
 
     <dimen name="header_height">50dp</dimen>
     <dimen name="header_icon_dimen">30dp</dimen>
